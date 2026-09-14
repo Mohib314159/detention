@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import * as T from '../dist/vendor/three.module.js';
 import {GLTFLoader} from '../dist/vendor/GLTFLoader.js';
-import {retargetClips} from '../dist/human.js';
+import {retargetClips,createHuman} from '../dist/human.js';
 globalThis.ProgressEvent=class {constructor(type,data){Object.assign(this,{type},data);}};
 const json=JSON.parse(fs.readFileSync('dist/assets/human.gltf','utf8'));
 for(const b of json.buffers)b.uri='data:application/octet-stream;base64,'+fs.readFileSync('dist/assets/'+b.uri).toString('base64');
@@ -19,3 +19,18 @@ for(const name of ['Punch_Jab','Punch_Cross','Melee_Hook','Walk_Loop','Idle_Fold
  action.stop();
 }
 console.log('PASS: all core clips bind to the real skeleton, including fingers, with finite hand motion. Visual QA remains separate.');
+
+const fresh=await new GLTFLoader().parseAsync(JSON.stringify(json),'');
+let hits=0;
+const human=await createHuman(new T.Scene(),()=>hits++,{asset:fresh,raw,hair:{scene:new T.Group()}});
+human.setVisible(true);
+for(let i=0;i<600;i++)human.update(1/60,100,false);
+assert(hits>=3,'Sustained gaze triggers repeated punches');
+for(let i=0;i<600;i++)human.update(1/60,0,false);
+assert(Math.abs(human.getPosition().z-.6)<.07,'Looking away returns to resting distance');
+assert.equal(human.getState().mode,'Idle_FoldArms_Loop');
+assert.equal(human.getState().activeActions,1,'Crossfaded actions are retired');
+const previousHits=hits;
+for(let i=0;i<600;i++)human.update(1/60,100,true);
+assert.equal(hits,previousHits,'Reduced motion suppresses boxing impacts');
+console.log('PASS: approach, repeated impacts, retreat, clip cleanup and reduced-motion suppression');

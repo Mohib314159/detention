@@ -2,9 +2,9 @@ import * as T from './vendor/three.module.js';
 import {GLTFLoader} from './vendor/GLTFLoader.js';
 
 // Authored CC0 skeletal clips. No procedural limb swinging on this character.
-export async function createHuman(scene,onImpact){
+export async function createHuman(scene,onImpact,preloaded=null){
  const loader=new GLTFLoader();
- const [asset,raw,hair]=await Promise.all([loader.loadAsync('./assets/human.gltf'),fetch('./assets/motions.json').then(r=>{if(!r.ok)throw Error('Animation load failed');return r.json();}),loader.loadAsync('./assets/hair.gltf')]);
+ const [asset,raw,hair]=preloaded?[preloaded.asset,preloaded.raw,preloaded.hair]:await Promise.all([loader.loadAsync('./assets/human.gltf'),fetch('./assets/motions.json').then(r=>{if(!r.ok)throw Error('Animation load failed');return r.json();}),loader.loadAsync('./assets/hair.gltf')]);
  const model=asset.scene,holder=new T.Group();holder.add(model);scene.add(holder);holder.visible=false;
  model.updateMatrixWorld(true);model.add(hair.scene);model.updateMatrixWorld(true);model.getObjectByName('Head').attach(hair.scene);
  model.traverse(o=>{if(!o.isMesh)return;o.castShadow=true;o.receiveShadow=true;if(o.material?.name==='MI_Superhero_Male'){
@@ -20,17 +20,17 @@ export async function createHuman(scene,onImpact){
  for(let i=0;i<=90;i++){action.time=action.getClip().duration*i/90;mixer.update(0);model.updateMatrixWorld(true);const reach=hand.getWorldPosition(new T.Vector3()).z-pelvis.getWorldPosition(new T.Vector3()).z;if(reach>far){far=reach;at=action.time;}}
  impacts[name]=at;action.stop();}
  holder.scale.setScalar(1.65);holder.position.set(0,0,.6);
- let current=null,mode='',elapsed=0,attack=0,hit=false,revengeTime=0,visible=false;
- function play(name,once=false,fade=.22){const next=actions[name];if(!next||next===current)return;next.reset().setEffectiveTimeScale(1).setEffectiveWeight(1).setLoop(once?T.LoopOnce:T.LoopRepeat,once?1:Infinity);next.clampWhenFinished=once;next.play();current?.crossFadeTo(next,fade,false);current=next;mode=name;elapsed=0;hit=false;}
+ let current=null,mode='',elapsed=0,attack=0,hit=false,revengeTime=0,visible=false,approaching=false;const fading=[];
+ function play(name,once=false,fade=.22){const next=actions[name];if(!next||next===current)return;next.reset().setEffectiveTimeScale(1).setEffectiveWeight(1).setLoop(once?T.LoopOnce:T.LoopRepeat,once?1:Infinity);next.clampWhenFinished=once;next.play();if(current){current.crossFadeTo(next,fade,false);fading.push({action:current,remaining:fade+.03});}current=next;mode=name;elapsed=0;hit=false;}
  play('Idle_FoldArms_Loop');
- return {setVisible(v){visible=v;holder.visible=v;},revenge(){revengeTime=1.6;play('Hit_Head',true,.1);},update(dt,value,reduced){if(!visible)return;elapsed+=dt;revengeTime=Math.max(0,revengeTime-dt);
-  const target=value>55?4.7:.6,distance=target-holder.position.z;const moving=Math.abs(distance)>.06;
-  if(moving){holder.position.z+=Math.sign(distance)*Math.min(Math.abs(distance),dt*2.1);holder.rotation.y=T.MathUtils.damp(holder.rotation.y,distance<0?Math.PI:0,10,dt);if(!revengeTime)play('Walk_Loop',false,.25);}
+ return {setVisible(v){visible=v;holder.visible=v;},revenge(){revengeTime=3.8;play('Hit_Head',true,.1);},update(dt,value,reduced){if(!visible)return;for(let i=fading.length-1;i>=0;i--){fading[i].remaining-=dt;if(fading[i].remaining<=0){if(fading[i].action!==current)fading[i].action.stop();fading.splice(i,1);}}elapsed+=dt;revengeTime=Math.max(0,revengeTime-dt);
+  if(value>55)approaching=true;else if(value<18)approaching=false;const target=approaching?4.7:.6,distance=target-holder.position.z;const moving=Math.abs(distance)>.06&&revengeTime<=0;
+  if(moving){holder.position.z+=Math.sign(distance)*Math.min(Math.abs(distance),dt*(distance>0?2.1:1.5));holder.rotation.y=T.MathUtils.damp(holder.rotation.y,0,10,dt);if(!revengeTime){play('Walk_Loop',false,.25);current.setEffectiveTimeScale(distance>0?1:-.8);}}
   else{holder.rotation.y=T.MathUtils.damp(holder.rotation.y,0,10,dt);if(!revengeTime){if(value>85&&!reduced){if(!/^Punch_|Melee_/.test(mode)||elapsed>current.getClip().duration+.16){play(mode==='Melee_Hook'?'Melee_Hook_Rec':['Punch_Jab','Punch_Cross','Melee_Hook'][attack++%3],true,.12);}}
   else play(value>15?'Idle_No_Loop':'Idle_FoldArms_Loop',false,.35);}}
   mixer.update(dt);
   if(!moving&&value>85&&!reduced&&impacts[mode]!==undefined&&!hit&&current.time>=impacts[mode]){hit=true;onImpact('bang');}
- },getPosition(){return holder.position;},getHeight(){return 2.85;}};
+ },getHeadPosition(){model.updateMatrixWorld(true);return model.getObjectByName('Head').getWorldPosition(new T.Vector3());},getPosition(){return holder.position;},getHeight(){return 2.85;},getState(){return {mode,activeActions:mixer.stats.actions.inUse,pendingFades:fading.length};}};
 }
 
 export function retargetClips(model,raw){
