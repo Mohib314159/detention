@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import {suspicionStep,settle,weekKey} from '../dist/engine.js';
+let s={value:0,stare:0};
+for(let i=0;i<10;i++)s=suspicionStep(s,true,.1);
+assert.equal(s.value,0,'Brief glance is forgiven');
+for(let i=0;i<41;i++)s=suspicionStep(s,true,.1);
+assert.equal(s.value,100,'Sustained gaze reaches rage');
+for(let i=0;i<20;i++)s=suspicionStep(s,null,.1);
+assert.equal(s.value,0,'Uncertain camera does not sustain punishment');
+const p={rp:0,credits:1,temper:0,week:weekKey(),weekCount:4,history:[]};
+const session={total:60,remaining:0,warnings:0,escapes:0,pauses:0};
+const result=settle(p,session,true);
+assert.equal(result.credits,4,'Fifth class awards normal credit plus two bonus');
+assert.equal(result.rp,30,'Perfect class awards bonus discipline');
+assert.equal(settle(p,{...session,escapes:1},true).rp,20,'Departure loses perfect bonus');
+assert.equal(settle(p,{...session,remaining:60},false).rp,0,'Failure cannot produce negative rank');
+console.log('All behavior tests passed');
