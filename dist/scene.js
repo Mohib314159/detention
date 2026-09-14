@@ -1,11 +1,12 @@
 import * as T from './vendor/three.module.js';
+import {createHuman} from './human.js';
 // Articulated toy-like character: facial features, shoulders, forearms and head
 // have independent transforms. Animation is continuous, never a sprite swap.
-export function createClassroom(host){
+export async function createClassroom(host){
 const scene=new T.Scene();scene.background=new T.Color('#454d46');scene.fog=new T.Fog('#454d46',13,28);
-const renderer=new T.WebGLRenderer({antialias:true,alpha:false,powerPreference:'low-power'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;host.append(renderer.domElement);renderer.domElement.setAttribute('aria-label','A sunlit three-dimensional classroom. Your instructor writes at his desk.');
+const renderer=new T.WebGLRenderer({antialias:true,alpha:false,powerPreference:'low-power'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;host.append(renderer.domElement);renderer.domElement.setAttribute('aria-label','A sunlit three-dimensional classroom. Your instructor writes at his desk.');
 const camera=new T.PerspectiveCamera(37,1,.1,60);camera.position.set(.25,3.2,8.8);camera.lookAt(0,1.7,0);
-scene.add(new T.HemisphereLight('#f9e6c1','#65695b',2.5));const sun=new T.DirectionalLight('#ffe3a8',4);sun.position.set(-4,7,5);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-8;sun.shadow.camera.right=8;sun.shadow.camera.top=8;sun.shadow.camera.bottom=-8;sun.shadow.normalBias=.03;scene.add(sun);const rim=new T.DirectionalLight('#a4cdd4',1.6);rim.position.set(4,4,-3);scene.add(rim);
+scene.add(new T.HemisphereLight('#f9e6c1','#65695b',2.5));const sun=new T.DirectionalLight('#fff0db',3);sun.position.set(-4,7,5);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-8;sun.shadow.camera.right=8;sun.shadow.camera.top=8;sun.shadow.camera.bottom=-8;sun.shadow.normalBias=.03;scene.add(sun);const rim=new T.DirectionalLight('#a4cdd4',1.6);rim.position.set(4,4,-3);scene.add(rim);
 const mat=(color,roughness=.8)=>new T.MeshStandardMaterial({color,roughness});const M={wall:mat('#67705d'),lower:mat('#414b3d'),wood:mat('#765337'),edge:mat('#ad7c49'),darkwood:mat('#42372b'),board:mat('#253f37'),skin:mat('#dcab78'),hair:mat('#e5d8b8'),jacket:mat('#454f45'),shirt:mat('#e8debc'),tie:mat('#a95035'),black:mat('#252a26'),paper:mat('#e6dabc'),metal:mat('#c7b786',.25),white:mat('#f1e8cd'),red:mat('#a64c3c')};
 function mesh(geo,m,parent,x=0,y=0,z=0){const o=new T.Mesh(geo,m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o;}
 const box=(w,h,d,m,p,x=0,y=0,z=0)=>mesh(new T.BoxGeometry(w,h,d),m,p,x,y,z);
@@ -53,8 +54,9 @@ const robot=new T.Group();head.add(robot);robot.visible=false;const shell=mat('#
 const cream=new T.Group();head.add(cream);cream.visible=false;for(let i=0;i<17;i++)ball(.10+((i*3)%5)*.018,.09+((i*7)%5)*.012,.08,M.white,cream,Math.sin(i*2.4)*.34,Math.cos(i*2.4)*.36+.08,.47);const pie=new T.Group();scene.add(pie);pie.visible=false;const crust=cyl(.3,.26,.07,mat('#c59051'),pie);crust.rotation.x=Math.PI/2;ball(.28,.28,.09,M.white,pie,0,0,.03);
 const drops=[];for(let i=0;i<30;i++){const d=ball(.045,.075,.035,new T.MeshStandardMaterial({color:'#9bd3df',transparent:true,opacity:.75}),scene);d.visible=false;drops.push(d);}
 let value=0,current=0,active=false,reduced=false,revengeAt=-100,revengeType='pie',time=0,last=performance.now(),punchUntil=0,lastRage=false,nextPunch=0,punchSide=0,skinMode='professor',audioEvent=()=>{};
+const human=await createHuman(scene,kind=>audioEvent(kind));
 function resize(){const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h);camera.aspect=w/h;camera.fov=w/h<.8?49:37;camera.updateProjectionMatrix();}new ResizeObserver(resize).observe(host);resize();
-function frame(now){requestAnimationFrame(frame);const dt=Math.min((now-last)/1000,.06);last=now;if(document.hidden)return;time+=dt;current=T.MathUtils.damp(current,value,6,dt);const a=current/100,notice=T.MathUtils.smoothstep(a,.02,.3),anger=T.MathUtils.smoothstep(a,.45,1),revengeTime=time-revengeAt,revenge=revengeTime<3.8;
+function frame(now){requestAnimationFrame(frame);const dt=Math.min((now-last)/1000,.15);last=now;if(document.hidden)return;time+=dt;current=T.MathUtils.damp(current,value,6,dt);const a=current/100,notice=T.MathUtils.smoothstep(a,.02,.3),anger=T.MathUtils.smoothstep(a,.45,1),revengeTime=time-revengeAt,revenge=revengeTime<3.8;
 // Four waypoints keep the walk outside the desk. Never translate through it.
 const walk=T.MathUtils.smoothstep(a,.43,1),stand=T.MathUtils.smoothstep(a,.35,.52);let tx=0,tz=-.5;
 if(walk<.25){tx=walk/.25*2.25;}else if(walk<.48){tx=2.25;tz=-.5+(walk-.25)/.23*2.55;}else if(walk<.70){tx=2.25*(1-(walk-.48)/.22);tz=2.05;}else{tx=0;tz=2.05+(walk-.70)/.30*4.05;}
@@ -71,11 +73,13 @@ const phase=1-(punchUntil-time)/.85;
 for(const arm of arms)arm.shoulder.position.z=0;
 if(value>85&&phase>=0&&phase<1){const arm=arms[punchSide];const reach=phase<.32?-Math.sin(phase/.32*Math.PI/2)*.22:phase<.48?(phase-.32)/.16:Math.pow(1-(phase-.48)/.52,2);
 arm.shoulder.rotation.x=-1.65;arm.shoulder.rotation.z=(punchSide?1:-1)*.15;arm.elbow.rotation.x=-.8*(1-Math.max(0,reach));arm.shoulder.position.z=reduced?0:reach*.62;
-if(phase>=.48&&!lastRage){lastRage=true;audioEvent('bang');}if(!reduced){head.rotation.z+=Math.sin(phase*Math.PI)*.075;torso.rotation.y=(punchSide?1:-1)*reach*.12;}}
+if(phase>=.48&&!lastRage){lastRage=true;if(skinMode!=='fighter')audioEvent('bang');}if(!reduced){head.rotation.z+=Math.sin(phase*Math.PI)*.075;torso.rotation.y=(punchSide?1:-1)*reach*.12;}}
 else torso.rotation.y=T.MathUtils.damp(torso.rotation.y,0,8,dt);
 pen.visible=anger<.25&&!revenge;
 if(revenge){head.rotation.x=-.15+Math.sin(revengeTime*8)*.035;head.rotation.z=Math.sin(revengeTime*4)*.12;arms[0].shoulder.rotation.z=-.9;arms[1].shoulder.rotation.z=.9;cream.visible=revengeType==='pie'&&revengeTime>.45;if(revengeType==='pie'){pie.visible=revengeTime<.5;pie.position.set(0,2.2,7-revengeTime*14);pie.rotation.z=revengeTime*5;}else{pie.visible=false;for(let i=0;i<drops.length;i++){const d=drops[i],t=(revengeTime+(i/30))%1.7;d.visible=revengeTime<2.7;d.position.set(Math.sin(i*7)*.55,3.4-t*2,-.05+Math.cos(i*3)*.4);}}}else{cream.visible=false;pie.visible=false;drops.forEach(d=>d.visible=false);}
-second.rotation.z=-time*.105;const targetZ=8.8-anger*.5;camera.position.z=T.MathUtils.damp(camera.position.z,targetZ,4,dt);camera.position.x=T.MathUtils.damp(camera.position.x,reduced?.25:.25+Math.sin(time*.16)*.04,3,dt);camera.lookAt(0,1.65+anger*.3,0);renderer.render(scene,camera);}
+const realistic=skinMode==='fighter';root.visible=!realistic;desk.visible=!realistic;chair.visible=!realistic;human.setVisible(realistic);human.update(dt,value,reduced);
+second.rotation.z=-time*.105;const targetZ=8.8-anger*.5;camera.position.z=T.MathUtils.damp(camera.position.z,targetZ,4,dt);camera.position.x=T.MathUtils.damp(camera.position.x,reduced?.25:.25+Math.sin(time*.16)*.04,3,dt);camera.lookAt(0,1.65+anger*.3,0);if(realistic){camera.position.z=8.8-anger*1.6;camera.lookAt(0,1.85+anger*.7,human.getPosition().z*anger);}
+renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-return{setSuspicion(n){value=n;},setActive(b){active=b;},setReduced(b){reduced=b;},setSoundHandler(fn){audioEvent=fn;},revenge(type){revengeType=type;revengeAt=time;value=0;audioEvent('splat');},setCostume(kind){skinMode=kind;classicParts.forEach(part=>part.visible=kind==='professor');sergeant.visible=kind==='sergeant';robot.visible=kind==='midnight';M.jacket.color.set(kind==='sergeant'?'#434b2f':kind==='midnight'?'#293849':'#454f45');M.tie.color.set(kind==='sergeant'?'#bb9b5a':kind==='midnight'?'#ac625b':'#a95035');},getState(){return{value,active,skinMode};}};
+return{setSuspicion(n){value=n;},setActive(b){active=b;},setReduced(b){reduced=b;},setSoundHandler(fn){audioEvent=fn;},revenge(type){revengeType=type;revengeAt=time;value=0;if(skinMode==='fighter')human.revenge();audioEvent('splat');},setCostume(kind){skinMode=kind;classicParts.forEach(part=>part.visible=kind==='professor');sergeant.visible=kind==='sergeant';robot.visible=kind==='midnight';M.jacket.color.set(kind==='sergeant'?'#434b2f':kind==='midnight'?'#293849':'#454f45');M.tie.color.set(kind==='sergeant'?'#bb9b5a':kind==='midnight'?'#ac625b':'#a95035');},getState(){return{value,active,skinMode};}};
 }

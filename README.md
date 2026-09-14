@@ -20,3 +20,6 @@ A short glance is forgiven; sustained looking increases suspicion. Missing/uncer
 
 ## Validation
 `node tests/engine.mjs` checks grace, escalation, recovery and rewards. Browser QA is necessary for rendering and permissions. No physical iPhone gaze accuracy or native app blocking claim is made.
+
+## Human animation edition
+Coach Vale uses Quaternius's CC0 skinned human model and authored clips, with rest-pose retargeting, finger tracks, crossfades and jab/cross/hook recovery. The primitive characters remain available in settings; the complete earlier edition is also in `versions/rigid-classroom-v1` with a verified SHA-256 manifest. Rig binding and focus tests pass; visual validation of this edition was blocked by unavailable browser controls at the time of implementation. This is not a claim of AAA animation quality.

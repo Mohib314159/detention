@@ -4,3 +4,6 @@
 @keyframes glass-hit{0%,100%{transform:translate(0)}20%{transform:translate(-5px,3px)}45%{transform:translate(4px,-2px)}70%{transform:translate(-2px,1px)}} body.impact:not(.reduced) #world{animation:glass-hit .24s ease-out}.theme-preview button{font-size:12px;white-space:normal}@media(max-width:600px){.room-note{display:none}.instructor-note h2{font-size:19px}.instructor-note .eyebrow{font-size:8px}}@media(prefers-reduced-motion:reduce){body.impact #world{animation:none!important}}
 
 .live .caption-wrap{bottom:255px}.top{top:max(20px,env(safe-area-inset-top))}#dock{bottom:max(26px,env(safe-area-inset-bottom))}@media(max-width:700px){.live .caption-wrap{bottom:255px}}
+
+.theme-preview{flex-wrap:wrap}.theme-preview button{flex:1 1 40%}
+#loading-room{z-index:6}
