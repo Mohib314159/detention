@@ -1,5 +1,5 @@
 import * as T from './vendor/three.module.js';
-import {makeLiquidSheet,liquidMaterial} from './liquid-sheets.js?v=15';
+import {makeLiquidSheet,liquidMaterial} from './liquid-sheets.js?v=16';
 
 // Bounded reusable particles. Contact, sound and recoil share one event.
 export function createRevengeFX(scene, onContact = () => {}) {

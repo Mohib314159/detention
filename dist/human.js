@@ -16,7 +16,7 @@ export async function createHuman(scene,onImpact,preloaded=null,variant='fighter
  const outfits=[];model.traverse(o=>{if(o.isMesh&&o.material?.vertexColors)outfits.push(o);});
  let facial=null;
  if(variant==='warden'){
-  const {createRealisticFace}=await import('./realistic-face.js?v=15');facial=preloaded?.facial||await createRealisticFace();facial.setIdentity(.65,.65);
+  const {createRealisticFace}=await import('./realistic-face.js?v=16');facial=preloaded?.facial||await createRealisticFace();facial.setIdentity(.65,.65);
   // Keep the authored body rig and replace only its static head surface.
   hair.scene.visible=false;model.traverse(o=>{if(!o.isMesh)return;if(o.name==='Eyes'||o.name==='Eyebrows')o.visible=false;if(o.material?.name==='MI_Superhero_Male'){
    const g=o.geometry.clone(),p=g.attributes.position,idx=g.index?.array||Array.from({length:p.count},(_,i)=>i),kept=[];
