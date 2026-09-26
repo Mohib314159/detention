@@ -1,5 +1,5 @@
 import * as T from './vendor/three.module.js';
-import {createRealisticFace,facePresets} from './realistic-face.js?v=16';
+import {createRealisticFace,facePresets} from './realistic-face.js?v=17';
 const $=s=>document.querySelector(s),host=$('#stage');let renderer;
 try{
 renderer=new T.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1;host.prepend(renderer.domElement);

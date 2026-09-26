@@ -1,7 +1,7 @@
-import {createEnvironments} from './environments.js?v=16';
+import {createEnvironments} from './environments.js?v=17';
 import * as T from './vendor/three.module.js';
-import {createHuman} from './human.js?v=16';
-import {createRevengeFX} from './revenge-fx.js?v=16';
+import {createHuman} from './human.js?v=17';
+import {createRevengeFX} from './revenge-fx.js?v=17';
 // Articulated toy-like character: facial features, shoulders, forearms and head
 // have independent transforms. Animation is continuous, never a sprite swap.
 export async function createClassroom(host,{timeScale=1,experimentalHuman=false}={}){
