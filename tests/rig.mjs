@@ -21,11 +21,12 @@ for(const name of ['Punch_Jab','Punch_Cross','Melee_Hook','Walk_Loop','Idle_Fold
 console.log('PASS: all core clips bind to the real skeleton, including fingers, with finite hand motion. Visual QA remains separate.');
 
 const fresh=await new GLTFLoader().parseAsync(JSON.stringify(json),'');
-let hits=0;
-const human=await createHuman(new T.Scene(),()=>hits++,{asset:fresh,raw,hair:{scene:new T.Group()}});
+let hits=0;const impactPoints=[];
+const human=await createHuman(new T.Scene(),(kind,detail)=>{hits++;assert.equal(kind,'bang');assert(detail?.point.toArray().every(Number.isFinite));impactPoints.push(detail.point.clone());},{asset:fresh,raw,hair:{scene:new T.Group()}});
 human.setVisible(true);
 for(let i=0;i<600;i++)human.update(1/60,100,false);
 assert(hits>=3,'Sustained gaze triggers repeated punches');
+assert(impactPoints.some(p=>p.distanceTo(impactPoints[0])>.05),'Different punches expose different impact positions');
 for(let i=0;i<600;i++)human.update(1/60,0,false);
 assert(Math.abs(human.getPosition().z-.6)<.07,'Looking away returns to resting distance');
 assert.equal(human.getState().mode,'Idle_FoldArms_Loop');
@@ -34,3 +35,16 @@ const previousHits=hits;
 for(let i=0;i<600;i++)human.update(1/60,100,true);
 assert.equal(hits,previousHits,'Reduced motion suppresses boxing impacts');
 console.log('PASS: approach, repeated impacts, retreat, clip cleanup and reduced-motion suppression');
+
+human.holdRevenge();human.update(.1,0,false);human.revenge();human.setWet(1);
+assert.equal(human.getState().mode,'Hit_Head');
+for(let i=0;i<180;i++)human.update(1/60,0,false);
+assert.notEqual(human.getState().mode,'Hit_Head','Recoil must recover instead of freezing');
+assert(human.getState().wetness>0&&human.getState().wetness<1);
+const facePose=human.getFacePose();
+assert(facePose.position.toArray().every(Number.isFinite));
+assert(Math.abs(facePose.rotation.length()-1)<1e-5);
+for(let i=0;i<600;i++)human.update(1/60,0,false);
+assert.equal(human.getState().wetness,0,'Wetness returns to original material');
+assert.equal(human.getState().activeActions,1,'Reaction crossfades retire old actions');
+console.log('PASS: revenge recovery, face anchor, wetness decay and action cleanup');

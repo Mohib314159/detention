@@ -42,3 +42,15 @@ Native iOS: SwiftUI presentation, ARKit supported-device checks plus ARFaceAncho
 - https://store.steampowered.com/app/3213850/gogh_Focus_with_Your_Avatar/
 - https://www.yourfocusfriend.com/
 - https://threejs.org/manual/en/animation-system.html
+
+## Latest user correction
+
+Keep the current rage-warning behavior, including the current departure reaction. Do not replace it with a silent disappointment mode. The proposed silent-departure implementation was reverted before delivery. Improve visual execution without changing this contract.
+
+## UI follow-up
+
+Revenge locker now shows weekly stamps, cost and balance after use; selection precedes the spending action. Session task/progress and clearer resume control added. Last duration, input method and break preference persist locally. Reward attempts during character loading preserve credits. Rage and departure behavior unchanged. Older UI kept in versions/before-locker-ui.
+
+## Instructor controls follow-up
+
+Avatar choices now show names and descriptions, avoiding internal rig terminology. Sound volume persists with a user-triggered warning sample; it does not enable sound automatically. A character-load failure has a retry action, and sessions cannot begin until the character exists. Rage behavior remains unchanged. Prior UI preserved in versions/before-instructor-controls.

@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {rewardAvailability} from '../dist/locker.js';
+assert.equal(rewardAvailability('pie',0,5),false);
+assert.equal(rewardAvailability('pie',1,0),true);
+assert.equal(rewardAvailability('water',1,0),true);
+assert.equal(rewardAvailability('bucket',10,4),false,'Credits cannot bypass the weekly unlock');
+assert.equal(rewardAvailability('bucket',1,5),false,'Unlocking the bucket does not waive its cost');
+assert.equal(rewardAvailability('bucket',2,5),true);
+assert.equal(rewardAvailability('unknown',20,5),false);
+console.log('PASS: reward credit requirements and weekly unlock are enforced independently');
