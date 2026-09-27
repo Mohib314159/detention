@@ -16,3 +16,38 @@ dialog{background:#f4f0e5;color:#2e382a;border-color:#a6af99;border-radius:6px}d
 @media(prefers-reduced-motion:reduce){.roster button{transition:none}}
 @media(max-width:480px){.top{gap:6px}.brand{font-size:21px;letter-spacing:1px}.tools{gap:4px}.pill{padding:7px 6px;font-size:11px}.pill b{font-size:14px}.tool-label{font-size:10px}.round{width:32px;min-width:32px;min-height:44px}.caption-wrap{top:232px;bottom:auto;right:29px;width:73%}.live .caption-wrap{top:auto;bottom:285px}.caption{font-size:13px;padding:8px 12px}.start-button{background:#ed8555}}
 @media(max-width:480px) and (max-height:740px){body:not(.live) .caption-wrap{top:211px}}
+/* Dialogue belongs beside the performance, never across the character's face. */
+body:not(.live) .caption-wrap{left:4%;right:auto;top:auto;bottom:220px;width:30%;max-width:none;transform:none}
+body:not(.live) .caption{background:none;border:0;box-shadow:none;padding:0;color:#48503f;font-size:15px;line-height:1.45;text-align:left;max-width:none}
+body:not(.live) .caption .speaker{display:none}
+.install-link{display:block;background:none;color:#f5bb87;padding:5px 0;min-height:44px;text-decoration:underline;text-underline-offset:4px;font-size:14px;border:0;cursor:pointer}
+.install-steps{padding-left:22px;line-height:1.6;color:#45513c}.install-steps li{padding:6px 0}.offline-pack{margin-top:24px;padding-top:16px;border-top:1px solid #adb59f}.offline-pack h3{font-size:20px;margin:0}.offline-pack progress{width:100%;accent-color:#b95c35;margin-top:15px}.offline-pack .secondary{width:100%;min-height:48px}
+@media(min-width:901px) and (max-height:780px){body:not(.live) .caption-wrap{bottom:178px;font-size:14px}.bottom-right{display:none}}
+@media(max-width:900px){.top{top:calc(14px + env(safe-area-inset-top))}.lobby-intro{top:calc(88px + env(safe-area-inset-top))}body:not(.live) .caption-wrap{top:calc(175px + env(safe-area-inset-top));bottom:auto;left:20px;right:20px;width:auto}body:not(.live) .caption{font-size:13px;line-height:1.35;min-height:36px}body:not(.live) #world{top:calc(224px + env(safe-area-inset-top));bottom:calc(236px + env(safe-area-inset-bottom))}body:not(.live) .vignette{top:calc(229px + env(safe-area-inset-top));bottom:calc(241px + env(safe-area-inset-bottom))}.instructor-note{bottom:calc(249px + env(safe-area-inset-bottom));right:30px;display:flex;flex-wrap:wrap;align-items:center;gap:0 12px;max-width:none}.instructor-note h2{width:100%;margin:3px 0}.instructor-note .change-instructor{min-height:36px}.install-link{font-size:12px;min-height:36px}.live .instructor-note{display:none}.live .caption-wrap{width:90%;left:50%;top:auto;bottom:calc(285px + env(safe-area-inset-bottom))}.live #dock{bottom:calc(16px + env(safe-area-inset-bottom))}.trial-label{top:calc(80px + env(safe-area-inset-top))}dialog{max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 32px);max-width:calc(100vw - 24px)}dialog input,dialog select{font-size:16px}.roster button{min-height:44px}}
+@media(max-width:900px) and (max-height:740px){.lobby-intro{top:calc(81px + env(safe-area-inset-top))}body:not(.live) .caption-wrap{top:calc(162px + env(safe-area-inset-top))}body:not(.live) #world{top:calc(206px + env(safe-area-inset-top));bottom:calc(220px + env(safe-area-inset-bottom))}body:not(.live) .vignette{top:calc(211px + env(safe-area-inset-top));bottom:calc(225px + env(safe-area-inset-bottom))}.instructor-note{bottom:calc(231px + env(safe-area-inset-bottom))}}
+@media(max-height:550px) and (orientation:landscape){body:not(.live) .lobby-intro{left:20px;top:90px;width:38%;right:auto}body:not(.live) .lobby-intro h1{font-size:26px}body:not(.live) #world{inset:85px 18px 145px 45%;border-radius:40px 40px 4px 4px}body:not(.live) .vignette{inset:90px 23px 150px calc(45% + 5px);border-radius:35px 35px 0 0}body:not(.live) .caption-wrap{left:20px;right:auto;top:195px;width:37%}body:not(.live) #dock{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;gap:8px 18px}.duration-heading{grid-column:1;grid-row:1}.durations{grid-column:1;grid-row:2}.start-button{grid-column:2;grid-row:1}body:not(.live) #dock>.quiet-button{grid-column:2;grid-row:2}.instructor-note{left:calc(45% + 18px);bottom:155px}.instructor-note h2{font-size:18px}.instructor-note .change-instructor{display:none}.install-link{min-height:30px}.roster small{display:none}}
+body[data-look=electric]{background:#2345e8;color:#fff;--gold:#d8f684}
+[data-look=electric] .brand,[data-look=electric] .brand span,[data-look=electric] .lobby-intro .eyebrow,[data-look=electric] .lobby-intro p,[data-look=electric] .bottom-right b,[data-look=electric] .bottom-right .quiet-button{color:#edf1ff}
+[data-look=electric] .lobby-intro em{color:#d8f684}
+[data-look=electric] .top{border-color:#aab7ff60}
+[data-look=electric] .pill,[data-look=electric] .round{color:#fff;background:#132f9c;border-color:#8093ed}
+[data-look=electric] .pill b{color:#d8f684}
+body[data-look=electric]:not(.live) #world{border-color:#122671;box-shadow:0 12px 0 #1932b2,0 18px 35px #0c195450}
+[data-look=electric] .roster button{background:#1b37b5;color:#fff;border-color:#7589df}
+[data-look=electric] .roster button small{color:#d9e0ff}
+[data-look=electric] .roster button[aria-pressed=true]{background:#f8faff;color:#1c3263;border-color:#d8f684;box-shadow:inset 0 -3px #d8f684}
+[data-look=electric] .roster button[aria-pressed=true] small{color:#53648f}
+body[data-look=electric]:not(.live) .caption{color:#eff2ff}
+body[data-look=electric]:not(.live) #dock{background:#f8faff;color:#1c3263;border-color:#bcc9f4}
+[data-look=electric] .duration-heading,[data-look=electric] .duration-heading span{color:#3e5182}
+[data-look=electric] .durations{background:#e4eafb;border-color:#bac8ef}
+[data-look=electric] .durations button{color:#455681}
+[data-look=electric] .durations button.selected{background:#2345e8;color:#fff}
+[data-look=electric] .start-button{background:#d8f684;color:#213119;border-color:#d8f684;box-shadow:0 3px #9bb955}
+body[data-look=electric]:not(.live) #dock>.quiet-button{color:#405686}
+@media(min-width:901px){body:not(.live) .caption-wrap{bottom:228px}.caption-wrap .caption{width:100%}}
+@media(min-width:901px) and (max-height:780px){body:not(.live) .caption-wrap{bottom:177px}}
+@media(max-width:900px) and (min-height:741px){body:not(.live) .caption-wrap{top:calc(189px + env(safe-area-inset-top))}body:not(.live) #world{top:calc(238px + env(safe-area-inset-top))}body:not(.live) .vignette{top:calc(243px + env(safe-area-inset-top))}}
+@media(max-width:390px){.top{left:12px;right:12px;gap:4px}.brand{font-size:19px;letter-spacing:.5px}.tools{gap:3px}.pill{padding:7px 5px}.round{width:30px;min-width:30px}.lobby-intro h1{font-size:30px}.instructor-note{left:27px;right:23px;gap:0 9px}}
+@media(max-width:340px){.brand{font-size:17px}.pill{font-size:10px;padding:7px 4px}.pill b{font-size:12px}.tool-label{font-size:9px}.round{width:28px;min-width:28px}.lobby-intro h1{font-size:27px}.roster button{gap:4px}.roster b{font-size:13px}.roster-face{width:24px;height:25px}.instructor-note .change-instructor,.install-link{font-size:11px}}
+@media(max-width:390px){.top .brand{padding:0}.top .tools .pill{padding:8px 5px}.top .tools .round{width:34px;min-width:34px;min-height:44px}.top .tools{gap:3px}}

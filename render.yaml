@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: detention-overseer
+    runtime: static
+    branch: codex/overseer-character
+    buildCommand: node scripts/prepare-static.mjs
+    staticPublishPath: ./dist
+    headers:
+      - path: /sw.js
+        name: Cache-Control
+        value: no-cache
+      - path: /index.html
+        name: Cache-Control
+        value: no-cache
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
