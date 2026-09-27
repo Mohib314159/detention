@@ -6,7 +6,7 @@ This deploys the character experiment. It does not merge it into main or change 
 2. Connect GitHub and allow Render to access **Mohib314159/detention**. If the repository is private, select it explicitly in GitHub's access screen.
 3. Select the repository and branch **codex/overseer-character**. Leave the Blueprint path as **render.yaml**.
 4. Review the static site named **detention-overseer**, then create the Blueprint. No database, API keys or environment variables are needed.
-5. Wait until the deployment is **Live**. Open the HTTPS address Render gives you. It should show Morrow/Riot and the ivory observation booth.
+5. Wait until the deployment is **Live**. Open the HTTPS address Render gives you. It should show Morrow/Riot and the dark focus interface.
 
 Alternative: **New → Static Site**, same repository and branch, build command `node scripts/prepare-static.mjs`, publish directory `dist`. Do not choose Web Service. The Blueprint additionally configures response headers.
 
@@ -18,7 +18,7 @@ The localhost link from your PC will not open this app on your phone. Use the Re
 
 ## Offline use
 
-In Detention choose **Get the app → Save offline**. The optional pack is approximately 77 MB; the exact size appears before download. Wait for confirmation, then close every Detention tab/window and reopen the installed app once while online. After that, try it in airplane mode. The pack includes character models and local camera tools; external Google fonts can fall back to system fonts offline. Your device can evict browser storage, so offline availability is not permanent.
+In Detention choose **Install app → Save offline**. The optional pack is approximately 77 MB; the exact size appears before download. Wait for confirmation, then close every Detention tab/window and reopen the installed app once while online. After that, try it in airplane mode. The pack includes character models and local camera tools; external Google fonts can fall back to system fonts offline. Your device can evict browser storage, so offline availability is not permanent.
 
 Browser and Home Screen storage can differ, and devices do not sync progress. This experiment has separate progress from the blue version.
 

@@ -1,4 +1,4 @@
-const CACHE='detention-overseer-20';
+const CACHE='detention-overseer-22';
 export function setupInstall({show,busy,toast}){
  let prompt=null,downloading=false;
  const installed=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;

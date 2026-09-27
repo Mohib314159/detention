@@ -1,6 +1,6 @@
 {
-  "version": 20,
-  "bytes": 80165669,
+  "version": 22,
+  "bytes": 80186069,
   "files": [
     "./assets/CREDITS.txt",
     "./assets/Hair_SimpleParted.bin",
@@ -43,6 +43,7 @@
     "./engine.js",
     "./environments.js",
     "./favicon.svg",
+    "./focus-ui.css",
     "./human.js",
     "./icon-192.png",
     "./icon-512.png",
@@ -53,6 +54,7 @@
     "./locker.js",
     "./main.js",
     "./manifest.webmanifest",
+    "./night.css",
     "./overseer.css",
     "./overseer.js",
     "./personality.js",

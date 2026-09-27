@@ -1,4 +1,4 @@
-const CACHE='detention-overseer-20';
+const CACHE='detention-overseer-22';
 const root=new URL('./',self.location.href);
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png']))));
 // Wait for every old tab to close before activating. Never reload a running class.
