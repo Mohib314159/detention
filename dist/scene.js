@@ -2,10 +2,10 @@ import {createOverseer} from './overseer.js?v=19';
 import {createEnvironments} from './environments.js?v=17';
 import * as T from './vendor/three.module.js';
 import {createHuman} from './human.js?v=17';
-import {createRevengeFX} from './revenge-fx.js?v=17';
+import {createRevengeFX} from './revenge-fx.js?v=23';
 // Articulated toy-like character: facial features, shoulders, forearms and head
 // have independent transforms. Animation is continuous, never a sprite swap.
-export async function createClassroom(host,{timeScale=1,experimentalHuman=false}={}){
+export async function createClassroom(host,{timeScale=1,experimentalHuman=false,initialCostume='morrow',onCharacterLoad=()=>{}}={}){
 const scene=new T.Scene();scene.background=new T.Color('#454d46');scene.fog=new T.Fog('#454d46',13,28);
 const renderer=new T.WebGLRenderer({antialias:true,alpha:false,powerPreference:'low-power'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;host.append(renderer.domElement);renderer.domElement.setAttribute('aria-label','A sunlit three-dimensional classroom. Your instructor writes at his desk.');
 const camera=new T.PerspectiveCamera(37,1,.1,60);camera.position.set(.25,3.2,8.8);camera.lookAt(0,1.7,0);
@@ -59,7 +59,28 @@ box(.14,.20,.19,M.skin,sergeant,0,.02,.44);box(.43,.09,.03,M.black,sergeant,0,-.
 const robot=new T.Group();head.add(robot);robot.visible=false;const shell=mat('#707b85',.27),visor=mat('#101b21',.2),glow=new T.MeshStandardMaterial({color:'#ef633b',emissive:'#e94623',emissiveIntensity:1.2});box(.95,.91,.75,shell,robot,0,.10,0);box(.84,.27,.06,visor,robot,0,.23,.4);for(const sign of[-1,1]){const eye=box(.27,.045,.025,glow,robot,sign*.22,.23,.44);eye.rotation.z=sign*.13;box(.14,.29,.4,M.black,robot,sign*.54,.08,0);}for(let i=0;i<5;i++)box(.055,.12,.03,M.black,robot,-.16+i*.08,-.17,.4);link([0,.55,0],[0,.80,0],.025,M.metal,robot);ball(.07,.07,.07,glow,robot,0,.83,0);
 let value=0,current=0,active=false,reduced=false,revengeAt=-100,revengeType='pie',time=0,last=performance.now(),punchUntil=0,lastRage=false,nextPunch=0,punchSide=0,skinMode='professor',audioEvent=()=>{};
 function emitImpact(kind,detail){if(detail?.point){const p=detail.point.clone().project(camera);audioEvent(kind,{x:T.MathUtils.clamp((p.x+1)/2,.08,.92),y:T.MathUtils.clamp((1-p.y)/2,.08,.92),side:detail.side});}else audioEvent(kind);}
-const humans={morrow:await createOverseer(scene,emitImpact),riot:await createOverseer(scene,emitImpact,'riot'),fighter:await createHuman(scene,emitImpact,null,experimentalHuman?'warden':'fighter'),rhea:await createHuman(scene,emitImpact,null,'rhea')};let human=humans.fighter;const isHuman=()=>['fighter','rhea','morrow','riot'].includes(skinMode);
+const humans={},pending={};let desiredCostume=initialCostume,outfit='original';
+async function loadCharacter(kind){
+ if(humans[kind])return humans[kind];
+ if(!pending[kind])pending[kind]=(async()=>{try{
+ const h=await (['morrow','riot'].includes(kind)?createOverseer(scene,emitImpact,kind):createHuman(scene,emitImpact,null,kind==='rhea'?'rhea':experimentalHuman?'warden':'fighter'));
+ h.setVisible(false);h.setOutfit(outfit);humans[kind]=h;return h;
+ }finally{delete pending[kind];}})();
+ return pending[kind];
+}
+let human=['morrow','riot','fighter','rhea'].includes(initialCostume)?await loadCharacter(initialCostume):null;
+async function chooseCostume(kind){
+ desiredCostume=kind;
+ if(['morrow','riot','fighter','rhea'].includes(kind)&&!humans[kind]){
+ onCharacterLoad(true,kind);
+ try{await loadCharacter(kind);}catch(error){if(desiredCostume===kind)onCharacterLoad(false,kind,error);return;}
+ if(desiredCostume!==kind)return;onCharacterLoad(false,kind);
+ }
+ Object.values(humans).forEach(h=>h.setVisible(false));human=humans[kind]||null;skinMode=kind;
+ classicParts.forEach(part=>part.visible=kind==='professor');sergeant.visible=kind==='sergeant';robot.visible=kind==='midnight';
+ M.jacket.color.set(kind==='sergeant'?'#434b2f':kind==='midnight'?'#293849':'#454f45');M.tie.color.set(kind==='sergeant'?'#bb9b5a':kind==='midnight'?'#ac625b':'#a95035');
+}
+const isHuman=()=>['fighter','rhea','morrow','riot'].includes(skinMode);
 const effects=createRevengeFX(scene,()=>{if(isHuman())human.revenge();if(isHuman()&&revengeType!=='pie')human.setWet(1);audioEvent('splat');});
 function resize(){const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h);camera.aspect=w/h;camera.fov=w/h<.8?43:37;camera.updateProjectionMatrix();}new ResizeObserver(resize).observe(host);resize();
 function frame(now){requestAnimationFrame(frame);const dt=Math.min((now-last)/1000,.15)*(typeof timeScale==='function'?timeScale():timeScale);last=now;if(document.hidden)return;time+=dt;current=T.MathUtils.damp(current,value,6,dt);const a=current/100,notice=T.MathUtils.smoothstep(a,.02,.3),anger=T.MathUtils.smoothstep(a,.45,1),revengeTime=time-revengeAt,revenge=revengeTime<4.8;
@@ -83,9 +104,9 @@ if(phase>=.48&&!lastRage){lastRage=true;if(!isHuman()){root.updateMatrixWorld(tr
 else torso.rotation.y=T.MathUtils.damp(torso.rotation.y,0,8,dt);
 pen.visible=anger<.25&&!revenge;
 if(revenge&&revengeTime>.48){head.rotation.x=-.15;arms[0].shoulder.rotation.z=-.9;arms[1].shoulder.rotation.z=.9;}
-const realistic=isHuman();root.visible=!realistic;desk.visible=!realistic&&background==='classroom';chair.visible=!realistic&&background==='classroom';human.setVisible(realistic);human.update(dt,value,reduced);effects.update(dt);
+const realistic=isHuman();root.visible=!realistic;desk.visible=!realistic&&background==='classroom';chair.visible=!realistic&&background==='classroom';human?.setVisible(realistic);human?.update(dt,value,reduced);effects.update(dt);
 second.rotation.z=-time*.105;const targetZ=8.8-anger*.5;camera.position.z=T.MathUtils.damp(camera.position.z,targetZ,4,dt);camera.position.x=T.MathUtils.damp(camera.position.x,reduced?.25:.25+Math.sin(time*.16)*.04,3,dt);camera.lookAt(0,1.65+anger*.3,0);if(realistic){const proximity=T.MathUtils.clamp((human.getPosition().z-.6)/4.1,0,1);camera.position.z=7.6;camera.position.x=0;camera.position.y=3.0;camera.lookAt(0,2.0+proximity*.35,human.getPosition().z);}
 renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-return{setLighting(night){lowLight=night;ambient.intensity=night?1.65:2.1;sun.intensity=night?2:background==='rooftop'?1.25:2.7;rim.intensity=night?.65:1.6;renderer.toneMappingExposure=night?.95:1;emblem.visible=!night;ivory.color.set(night?'#202724':'#aaa797');orange.color.set(night?'#68472e':'#e66c38');chamber.traverse(o=>{if(o.isMesh&&o.material.isMeshBasicMaterial&&!o.material.map)o.material.color.set(night?'#72694f':'#fff1c7');});if(background==='chamber'){scene.background.set(night?'#222926':'#96978b');scene.fog.color.copy(scene.background);}},setSuspicion(n){value=n;},setActive(b){active=b;},setReduced(b){reduced=b;},setSoundHandler(fn){audioEvent=fn;},revenge(type){revengeType=type;revengeAt=time;value=0;if(isHuman())human.holdRevenge();effects.start(type,()=>isHuman()?human.getFacePose().position:head.getWorldPosition(new T.Vector3()),reduced,()=>isHuman()?human.getFacePose().rotation:head.getWorldQuaternion(new T.Quaternion()));},setBackground(id){background=['gym','rooftop','chamber'].includes(id)?id:'classroom';classroomObjects.forEach(o=>o.visible=background==='classroom');environments.set(background);chamber.visible=background==='chamber';const color=background==='chamber'?(lowLight?'#222926':'#96978b'):background==='rooftop'?'#101e30':background==='gym'?'#30383e':'#454d46';scene.background.set(color);scene.fog.color.set(color);sun.intensity=lowLight?2:background==='rooftop'?1.25:2.7;renderer.domElement.setAttribute('aria-label',background+' with your animated instructor');},setOutfit(id){Object.values(humans).forEach(h=>h.setOutfit(id));},getDodge(){return isHuman()?human.getPosition().x:0;},setDodge(enabled){human.setDodge(enabled);},setCostume(kind){Object.values(humans).forEach(h=>h.setVisible(false));human=humans[kind]||humans.fighter;skinMode=kind;classicParts.forEach(part=>part.visible=kind==='professor');sergeant.visible=kind==='sergeant';robot.visible=kind==='midnight';M.jacket.color.set(kind==='sergeant'?'#434b2f':kind==='midnight'?'#293849':'#454f45');M.tie.color.set(kind==='sergeant'?'#bb9b5a':kind==='midnight'?'#ac625b':'#a95035');},getState(){return{value,active,skinMode,effects:effects.getState()};}};
+return{setLighting(night){lowLight=night;ambient.intensity=night?1.65:2.1;sun.intensity=night?2:background==='rooftop'?1.25:2.7;rim.intensity=night?.65:1.6;renderer.toneMappingExposure=night?.95:1;emblem.visible=!night;ivory.color.set(night?'#202724':'#aaa797');orange.color.set(night?'#68472e':'#e66c38');chamber.traverse(o=>{if(o.isMesh&&o.material.isMeshBasicMaterial&&!o.material.map)o.material.color.set(night?'#72694f':'#fff1c7');});if(background==='chamber'){scene.background.set(night?'#222926':'#96978b');scene.fog.color.copy(scene.background);}},setSuspicion(n){value=n;},setActive(b){active=b;},setReduced(b){reduced=b;},setSoundHandler(fn){audioEvent=fn;},revenge(type){revengeType=type;revengeAt=time;value=0;if(isHuman())human.holdRevenge();effects.start(type,()=>isHuman()?human.getFacePose().position:head.getWorldPosition(new T.Vector3()),reduced,()=>isHuman()?human.getFacePose().rotation:head.getWorldQuaternion(new T.Quaternion()));},setBackground(id){background=['gym','rooftop','chamber'].includes(id)?id:'classroom';classroomObjects.forEach(o=>o.visible=background==='classroom');environments.set(background);chamber.visible=background==='chamber';const color=background==='chamber'?(lowLight?'#222926':'#96978b'):background==='rooftop'?'#101e30':background==='gym'?'#30383e':'#454d46';scene.background.set(color);scene.fog.color.set(color);sun.intensity=lowLight?2:background==='rooftop'?1.25:2.7;renderer.domElement.setAttribute('aria-label',background+' with your animated instructor');},setOutfit(id){outfit=id;Object.values(humans).forEach(h=>h.setOutfit(id));},getDodge(){return isHuman()?human.getPosition().x:0;},setDodge(enabled){human?.setDodge(enabled);},setCostume:chooseCostume,isLoading(){return Boolean(pending[desiredCostume]);},getState(){return{value,active,skinMode,effects:effects.getState()};}};
 }

@@ -15,7 +15,7 @@ export function makeLiquidSheet(material, {radial=true, sectors=72, rows=12}={})
       if(radial){
         const lobes=1+.13*Math.sin(a*7+1)+.09*Math.sin(a*13)+.055*Math.sin(a*23+2);
         const radius=settled?.22:(water?.18:.16)+Math.min(t,.5)*(water?1.7:1.05);
-        const r=v*radius*(1+(lobes-1)*v*v*(settled?.35:1));
+        const r=v*radius*(1+(lobes-1)*v*v*(settled?.85:1));
         positions[i]=Math.cos(a)*r;
         positions[i+1]=Math.sin(a)*r*(water?.37:.8)-(settled?Math.max(0,t-1)*.015*v:1.5*t*t*v);
         positions[i+2]=settled?.21+.08*(1-v*v):.15+Math.sin(v*Math.PI)*.13+v*v*(water?.25:.14)*Math.sin(a*5+t*7);

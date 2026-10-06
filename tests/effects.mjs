@@ -13,3 +13,13 @@ for(const type of ['pie','water','bucket']){
  scene.traverse(o=>{if(o.isMesh)assert.ok(o.position.toArray().every(Number.isFinite));});
 }
 console.log('PASS: pie/water/bucket contact once, visible particles, finite positions, cleanup and restart.');
+
+// A moving head and tipping bucket must keep the stream attached to the actual rim.
+for(const kind of ['water','bucket']){
+ const fx=createRevengeFX(new T.Scene());let x=0;
+ fx.start(kind,()=>new T.Vector3(x,2.7,.6));
+ for(let i=0;i<150;i++){x=Math.sin(i/20)*.2;fx.update(.016);const state=fx.getState();if(state.pouring){
+  assert.ok(new T.Vector3(...state.lip).distanceTo(new T.Vector3(...state.streamStart))<1e-6,'stream detached from rim');
+ }}
+}
+console.log('PASS: water stream remains attached to the tipping rim and moving target.');

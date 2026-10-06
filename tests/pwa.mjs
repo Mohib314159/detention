@@ -10,3 +10,8 @@ assert.equal(await (await request('https://test.example/main.js?v=20')).text(),'
 assert.equal(await (await request('https://test.example/main.js?v=20')).text(),'fresh');assert.equal(await (await request('https://test.example/?app=1','navigate')).text(),'shell');
 const say=createDialogue(()=>0);assert.notEqual(say('riot','idle'),say('riot','idle'));assert.notEqual(say('riot','rage'),say('morrow','rage'));assert.equal(say('riot','rage','gentle'),'Eyes away. One step at a time.');
 console.log('PASS: manifest assets, full offline pack, versioned module fallback, offline navigation, varied character dialogue and gentle tone.');
+
+online=true;await request('https://test.example/assets/morrow/robot.glb');
+context.fetch=async()=>{throw Error('cached model should not access network');};
+assert.equal(await (await request('https://test.example/assets/morrow/robot.glb')).text(),'fresh');
+console.log('PASS: returning visits reuse cached model assets without network.');

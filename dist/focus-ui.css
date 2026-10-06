@@ -20,3 +20,12 @@ body:not(.live) #dock{left:24px;right:24px;bottom:calc(75px + env(safe-area-inse
 @media(prefers-reduced-motion:reduce){.start-button:active{transform:none}}
 @media(max-width:900px){.durations button{min-height:44px}.utility-nav button{min-height:44px}.top .round{width:44px;height:44px;min-width:44px;min-height:44px}.change-instructor{min-height:40px}.roster button{min-height:44px}}
 @media(max-width:900px){.duration-heading{display:none}#setup-next{position:sticky;bottom:0;box-shadow:0 -12px 20px var(--panel)}.choice{padding:12px}.choice small{line-height:1.45}.session-receipt{margin-top:14px}.instructor-note h2{font-size:18px}.change-instructor{background:#19241bbb}}
+
+/* Keep desktop setup in document flow: its sections cannot overlap at short heights. */
+.lobby-controls{display:contents}
+@media(min-width:901px){
+ body:not(.live) .lobby-controls{position:fixed;inset:104px 40px 24px auto;width:348px;display:flex;flex-direction:column;gap:24px;overflow-y:auto;overflow-x:hidden;padding:8px;scrollbar-width:thin}
+ body:not(.live) .lobby-controls .lobby-intro,body:not(.live) .lobby-controls #dock,body:not(.live) .lobby-controls .utility-nav{position:static;inset:auto;width:100%;transform:none;flex:none}
+ body:not(.live) .lobby-controls .lobby-intro{margin-bottom:auto}
+ body:not(.live) .lobby-controls .utility-nav{padding-top:12px}
+}
