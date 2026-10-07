@@ -1,5 +1,7 @@
 # Detention
 
+[Live app](https://detention-overseer.onrender.com/)
+
 Local browser prototype. Serve `dist` over HTTPS (or localhost). No build step.
 
 ## iPhone test
